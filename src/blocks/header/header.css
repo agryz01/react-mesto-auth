@@ -4,6 +4,9 @@
   padding-right: calc(20.83% - 66.67px);
   padding-bottom: calc(.98% + 28.47px);
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
 
 .header::after {
