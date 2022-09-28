@@ -8,6 +8,8 @@ import ImagePopup from "./ImagePopup";
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
+import Login from './Login';
+import Register from './Register';
 import { api } from '../utils/Api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
@@ -157,10 +159,12 @@ function App() {
           <ImagePopup isOpen={isImagePopupOpen} card={selectedCard} onClose={closeAllPopups} />
         </Route>
         <Route path="/sign-up">
-          <Header link={'Войти'} />
+          <Header link={'/sign-in'} menu={'Войти'} />
+          <Register />
         </Route>
         <Route path="/sign-in">
-        <Header link={'Регистрация'} />
+          <Header link={'/sign-up'} menu={'Регистрация'} />
+          <Login />
         </Route>
       </CurrentUserContext.Provider>
     </div >
