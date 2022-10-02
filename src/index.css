@@ -3,6 +3,8 @@
 @import url(./blocks/page/page.css);
 @import url(./blocks/header/header.css);
 @import url(./blocks/header/__logo/header__logo.css);
+@import url(./blocks/header/__link-container/header__link-container.css);
+@import url(./blocks/header/__email/header__email.css);
 @import url(./blocks/header/__menu/header__menu.css);
 @import url(./blocks/auth/auth.css);
 @import url(./blocks/auth/__container/auth__container.css);

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { auth } from '../utils/Auth';
 
-export default function Register() {
+export default function Register({ handleRegistering }) {
 
   const [login, setLogin] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -17,16 +16,7 @@ export default function Register() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    console.log('задано', login, password);
-    auth.setUser(login, password)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err); // выведем ошибку в консоль
-      })
-    setLogin('');
-    setPassword('');
+    handleRegistering(login, password);
   }
 
   return (

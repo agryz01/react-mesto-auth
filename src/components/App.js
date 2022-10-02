@@ -1,5 +1,5 @@
-import React, { Children } from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import React from 'react';
+import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
@@ -12,6 +12,7 @@ import Login from './Login';
 import Register from './Register';
 import InfoTooltip from './InfoTooltip';
 import { api } from '../utils/Api';
+import { auth } from '../utils/Auth';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import ProtectedRoute from './ProtectedRoute';
 
@@ -21,6 +22,19 @@ function App() {
   const [cards, setCards] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [loggedIn, setLoggedIn] = React.useState(false);
+  const history = useHistory();
+  const [isEmail, setIsEmail] = React.useState('');
+
+  React.useEffect(() => {
+    if (localStorage.token) {
+      const miToken = localStorage.token;
+      auth.validityToken(miToken)
+    .then((res) => {
+      setLoggedIn(true);
+      setIsEmail(res.data.email);
+    })
+    }
+  }, [localStorage])
 
   React.useEffect(() => {
     Promise.all([
@@ -40,8 +54,8 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = React.useState(false);
-  const [isInfoTooltipPopupOpen, setIsInfoTooltipPopupOpen] = React.useState(true);
-  const [success, setSuccess] = React.useState(true);
+  const [isInfoTooltipPopupOpen, setIsInfoTooltipPopupOpen] = React.useState(false);
+  const [success, setSuccess] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({});
 
   function handleEditAvatarClick() {
@@ -135,6 +149,42 @@ function App() {
       })
   }
 
+  function handleRegistering(login, password) {
+
+    auth.setUser(login, password)
+      .then((res) => {
+        setSuccess(true);
+      })
+      .catch((err) => {
+        setSuccess(false);
+        console.log(err); // выведем ошибку в консоль
+      })
+      .finally(() => setIsInfoTooltipPopupOpen(true))
+  }
+
+  function handleLogin(login, password) {
+    auth.authUser(login, password)
+      .then((res) => {
+        if (res.token) {
+          localStorage.setItem('token', res.token);
+          setLoggedIn(true);
+          history.push('/');
+        }
+
+      })
+      .catch((err) => {
+        setSuccess(false);
+        setIsInfoTooltipPopupOpen(true);
+        console.log(err); // выведем ошибку в консоль
+      })
+  }
+
+  React.useEffect(() => {
+    if (success && !isInfoTooltipPopupOpen) {
+      history.push('/sign-in');
+    }
+  }, [isInfoTooltipPopupOpen])
+
   const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || isImagePopupOpen || isInfoTooltipPopupOpen;
 
   React.useEffect(() => {
@@ -156,28 +206,28 @@ function App() {
       <CurrentUserContext.Provider value={currentUser}>
         <Switch>
           <ProtectedRoute loggedIn={loggedIn} exact path="/">
-            <Header link='/sign-in' menu={'Выйти'} />
+            <Header email={isEmail} link='/sign-in' menu={'Выйти'} />
             <Main cards={cards} onCardDelete={handleCardDelete} onCardLike={handleCardLike} onCardClick={handleCardClick} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} />
             <Footer />
-            <EditProfilePopup buttonText={isLoading ? 'Сохранение...' : 'Сохранить'} onUpdateUser={handleUpdateUser} onClose={closeAllPopups} isOpen={isEditProfilePopupOpen} />
-            <AddPlacePopup buttonText={isLoading ? 'Создание...' : 'Создать'} onAddPlace={handleAddPlace} onClose={closeAllPopups} isOpen={isAddPlacePopupOpen} />
-            <EditAvatarPopup buttonText={isLoading ? 'Сохранение...' : 'Сохранить'} onUpdateAvatar={handleUpdateAvatar} onClose={closeAllPopups} isOpen={isEditAvatarPopupOpen} />
-            <PopupWithForm name='window_confirmation' title='Вы уверены?' buttonText='Да' />
-            <ImagePopup isOpen={isImagePopupOpen} card={selectedCard} onClose={closeAllPopups} />
           </ProtectedRoute>
           <Route path="/sign-up">
             <Header link='/sign-in' menu={'Войти'} />
-            <Register />
-            <InfoTooltip success={success} isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups} />
+            <Register handleRegistering={handleRegistering} />
           </Route>
           <Route path="/sign-in">
             <Header link='/sign-up' menu={'Регистрация'} />
-            <Login />
+            <Login handleLogin={handleLogin} />
           </Route>
           <Route path="/*">
             <Redirect to={'/'} />
           </Route>
         </Switch>
+        <EditProfilePopup buttonText={isLoading ? 'Сохранение...' : 'Сохранить'} onUpdateUser={handleUpdateUser} onClose={closeAllPopups} isOpen={isEditProfilePopupOpen} />
+        <AddPlacePopup buttonText={isLoading ? 'Создание...' : 'Создать'} onAddPlace={handleAddPlace} onClose={closeAllPopups} isOpen={isAddPlacePopupOpen} />
+        <EditAvatarPopup buttonText={isLoading ? 'Сохранение...' : 'Сохранить'} onUpdateAvatar={handleUpdateAvatar} onClose={closeAllPopups} isOpen={isEditAvatarPopupOpen} />
+        <PopupWithForm name='window_confirmation' title='Вы уверены?' buttonText='Да' />
+        <ImagePopup isOpen={isImagePopupOpen} card={selectedCard} onClose={closeAllPopups} />
+        <InfoTooltip success={success} isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups} />
       </CurrentUserContext.Provider>
     </div >
   );

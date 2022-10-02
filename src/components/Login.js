@@ -1,22 +1,22 @@
 import React from 'react';
 
-export default function Login() {
+export default function Login({ handleLogin }) {
 
-const [login, setLogin] = React.useState('');
-const [password, setPassword] = React.useState('');
+  const [login, setLogin] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
-function handleChangeLogin(e) {
-  setLogin(e.target.value);
-}
+  function handleChangeLogin(e) {
+    setLogin(e.target.value);
+  }
 
-function handleChangePasswosd(e) {
-  setPassword(e.target.value);
-}
+  function handleChangePasswosd(e) {
+    setPassword(e.target.value);
+  }
 
-function handleSubmit(e) {
-  e.preventDefault();
-  console.log(login, password);
-}
+  function handleSubmit(e) {
+    e.preventDefault();
+    handleLogin(login, password);
+  }
 
   return (
     <section className="auth">

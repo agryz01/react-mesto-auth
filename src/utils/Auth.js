@@ -13,6 +13,26 @@ export default class Auth {
     })
       .then(res => this._response(res));
   }
+
+  authUser(email, password) {
+    return fetch(`${this._url}signin`, {
+      method: 'POST',
+      headers: this._headers,
+      body: JSON.stringify({ password, email })
+    })
+      .then(res => this._response(res));
+  }
+
+  validityToken(token) {
+    return fetch(`${this._url}users/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(res => this._response(res));
+  }
 }
 
 export const auth = new Auth({
@@ -24,6 +44,6 @@ export const auth = new Auth({
     if (res.ok) {
       return res.json();
     }
-    return Promise.reject(`Ошибка: ${res.status}`);
+    return Promise.reject(`Ошибка: ${ res.status }`);
   }
 })
