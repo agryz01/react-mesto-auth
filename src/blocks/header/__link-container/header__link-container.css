@@ -1,5 +1,5 @@
 .header__link-container {
-  display: flex;
+  display: none;
   column-gap: 24px;
   margin-right: calc(42.43px - 4.82%);
 }

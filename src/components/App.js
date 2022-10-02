@@ -29,12 +29,12 @@ function App() {
     if (localStorage.token) {
       const miToken = localStorage.token;
       auth.validityToken(miToken)
-    .then((res) => {
-      setLoggedIn(true);
-      setIsEmail(res.data.email);
-    })
+        .then((res) => {
+          setLoggedIn(true);
+          setIsEmail(res.data.email);
+        })
     }
-  }, [localStorage])
+  }, [])
 
   React.useEffect(() => {
     Promise.all([
@@ -179,11 +179,17 @@ function App() {
       })
   }
 
+  function handleExit() {
+    localStorage.removeItem('token');
+    setLoggedIn(false);
+    history.push('/sign-in');
+  }
+
   React.useEffect(() => {
     if (success && !isInfoTooltipPopupOpen) {
       history.push('/sign-in');
     }
-  }, [isInfoTooltipPopupOpen])
+  }, [isInfoTooltipPopupOpen, success, history])
 
   const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || isImagePopupOpen || isInfoTooltipPopupOpen;
 
@@ -204,18 +210,19 @@ function App() {
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
+        <Header handleExit={handleExit} email={isEmail} />
         <Switch>
           <ProtectedRoute loggedIn={loggedIn} exact path="/">
-            <Header email={isEmail} link='/sign-in' menu={'Выйти'} />
+            {/* <Header email={isEmail} link='/sign-in' menu={'Выйти'} /> */}
             <Main cards={cards} onCardDelete={handleCardDelete} onCardLike={handleCardLike} onCardClick={handleCardClick} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} />
             <Footer />
           </ProtectedRoute>
           <Route path="/sign-up">
-            <Header link='/sign-in' menu={'Войти'} />
+            {/* <Header link='/sign-in' menu={'Войти'} /> */}
             <Register handleRegistering={handleRegistering} />
           </Route>
           <Route path="/sign-in">
-            <Header link='/sign-up' menu={'Регистрация'} />
+            {/* <Header link='/sign-up' menu={'Регистрация'} /> */}
             <Login handleLogin={handleLogin} />
           </Route>
           <Route path="/*">
