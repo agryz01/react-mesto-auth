@@ -10,13 +10,14 @@ export default function Header(props) {
   const headerMenu = `header__menu ${!isPage && 'header__menu_active'}`;
 
   return (
-    <header className="header">
-      <Link to='/' className="header__logo" />
-      <div className={linkСontainer}>
-        <p className='header__email'>{props.email}</p>
-        <p onClick={props.handleExit} className='header__exit'>Выйти</p>
-      </div>
-      <Link to={isLogin ? '/sign-up' : '/sign-in'} className={headerMenu}>{isLogin ? 'Регистрация' : 'Войти'}</Link>
-    </header>
+      <header className="header">
+        <Link to='/' className="header__logo" />
+        <div className={linkСontainer}>
+          <div className='header__burger' />
+          <p className='header__email'>{props.email}</p>
+          <p onClick={props.handleExit} className='header__exit'>Выйти</p>
+        </div>
+        <Link to={isLogin ? '/sign-up' : '/sign-in'} className={headerMenu}>{isLogin ? 'Регистрация' : 'Войти'}</Link>
+      </header>
   );
 }
