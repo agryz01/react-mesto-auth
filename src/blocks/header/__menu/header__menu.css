@@ -6,8 +6,8 @@
   line-height: 1.22;
   color: rgba(255, 255, 255, 1);
   margin: 0;
-  display: none;
-  margin-right: calc(42.43px - 4.82%);
+  /* display: none; */
+  /* margin-right: calc(42.43px - 4.82%); */
 }
 
 .header__menu:hover {

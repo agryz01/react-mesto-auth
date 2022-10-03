@@ -28,7 +28,7 @@ export default function AddPlacePopup(props) {
 }, [props.isOpen]);
 
   return (
-    <PopupWithForm onSubmit={handleSubmit} onClose={props.onClose} isOpen={props.isOpen} name='window_add' title='Новое место' buttonText={props.buttonText}>
+    <PopupWithForm onSubmit={handleSubmit} onClose={props.onClose} isOpen={props.isOpen} name='window_add' title='Новое место' buttonText={props.isLoading ? 'Создание...' : 'Создать'}>
       <label className="popup__field">
         <input value={placeName} onChange={handleChangePlaceName} type="text" name="placename" id="place-input" minLength={2} maxLength={30} required placeholder="Название" className="popup__input-text popup__input-text_input_place" />
         <span className="popup__input-error place-input-error" />

@@ -23,7 +23,7 @@ function App() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [loggedIn, setLoggedIn] = React.useState(false);
   const history = useHistory();
-  const [isEmail, setIsEmail] = React.useState('');
+  const [email, setEmail] = React.useState('');
 
   React.useEffect(() => {
     if (localStorage.token) {
@@ -31,7 +31,7 @@ function App() {
       auth.validityToken(miToken)
         .then((res) => {
           setLoggedIn(true);
-          setIsEmail(res.data.email);
+          setEmail(res.data.email);
         })
     }
   }, [])
@@ -168,6 +168,7 @@ function App() {
         if (res.token) {
           localStorage.setItem('token', res.token);
           setLoggedIn(true);
+          setEmail(login);
           history.push('/');
         }
 
@@ -180,9 +181,9 @@ function App() {
   }
 
   function handleExit() {
-    localStorage.removeItem('token');
     setLoggedIn(false);
-    history.push('/sign-in');
+    localStorage.removeItem('token');
+    // history.push('/sign-in');
   }
 
   React.useEffect(() => {
@@ -210,28 +211,27 @@ function App() {
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
-        <Header handleExit={handleExit} email={isEmail} />
         <Switch>
           <ProtectedRoute loggedIn={loggedIn} exact path="/">
-            {/* <Header email={isEmail} link='/sign-in' menu={'Выйти'} /> */}
+            <Header handleExit={handleExit} email={email} link='/sign-in' menu={'Выйти'} />
             <Main cards={cards} onCardDelete={handleCardDelete} onCardLike={handleCardLike} onCardClick={handleCardClick} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} />
             <Footer />
           </ProtectedRoute>
           <Route path="/sign-up">
-            {/* <Header link='/sign-in' menu={'Войти'} /> */}
+            <Header link='/sign-in' menu={'Войти'} />
             <Register handleRegistering={handleRegistering} />
           </Route>
           <Route path="/sign-in">
-            {/* <Header link='/sign-up' menu={'Регистрация'} /> */}
+            <Header link='/sign-up' menu={'Регистрация'} />
             <Login handleLogin={handleLogin} />
           </Route>
           <Route path="/*">
             <Redirect to={'/'} />
           </Route>
         </Switch>
-        <EditProfilePopup buttonText={isLoading ? 'Сохранение...' : 'Сохранить'} onUpdateUser={handleUpdateUser} onClose={closeAllPopups} isOpen={isEditProfilePopupOpen} />
-        <AddPlacePopup buttonText={isLoading ? 'Создание...' : 'Создать'} onAddPlace={handleAddPlace} onClose={closeAllPopups} isOpen={isAddPlacePopupOpen} />
-        <EditAvatarPopup buttonText={isLoading ? 'Сохранение...' : 'Сохранить'} onUpdateAvatar={handleUpdateAvatar} onClose={closeAllPopups} isOpen={isEditAvatarPopupOpen} />
+        <EditProfilePopup isLoading={isLoading} onUpdateUser={handleUpdateUser} onClose={closeAllPopups} isOpen={isEditProfilePopupOpen} />
+        <AddPlacePopup isLoading={isLoading} onAddPlace={handleAddPlace} onClose={closeAllPopups} isOpen={isAddPlacePopupOpen} />
+        <EditAvatarPopup isLoading={isLoading} onUpdateAvatar={handleUpdateAvatar} onClose={closeAllPopups} isOpen={isEditAvatarPopupOpen} />
         <PopupWithForm name='window_confirmation' title='Вы уверены?' buttonText='Да' />
         <ImagePopup isOpen={isImagePopupOpen} card={selectedCard} onClose={closeAllPopups} />
         <InfoTooltip success={success} isOpen={isInfoTooltipPopupOpen} onClose={closeAllPopups} />

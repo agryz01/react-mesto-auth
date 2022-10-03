@@ -12,9 +12,9 @@
     font-size: 14px;
   }
 }
-
+/* 
 @media (max-width: 710px) {
   .header__email {
     display: none;
   }
-}
+} */
