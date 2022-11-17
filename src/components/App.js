@@ -12,7 +12,6 @@ import Login from './Login';
 import Register from './Register';
 import InfoTooltip from './InfoTooltip';
 import { api } from '../utils/Api';
-import { auth } from '../utils/Auth';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import ProtectedRoute from './ProtectedRoute';
 
@@ -21,20 +20,9 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [loggedIn, setLoggedIn] = React.useState(false);
+  const [loggedIn, setLoggedIn] = React.useState(true);
   const history = useHistory();
   const [email, setEmail] = React.useState('');
-
-  React.useEffect(() => {
-    if (localStorage.token) {
-      const miToken = localStorage.token;
-      auth.validityToken(miToken)
-        .then((res) => {
-          setLoggedIn(true);
-          setEmail(res.data.email);
-        })
-    }
-  }, [])
 
   React.useEffect(() => {
     Promise.all([
@@ -42,13 +30,16 @@ function App() {
       api.getCards()
     ])
       .then(([userData, cardData]) => {
+        setLoggedIn(true);
         setCards(cardData);
         setCurrentUser(userData);
+        setEmail(userData.email);
       })
       .catch((err) => {
+        setLoggedIn(false);
         console.log(err); // выведем ошибку в консоль
       })
-  }, [])
+  }, [loggedIn])
 
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
@@ -114,8 +105,7 @@ function App() {
   }
 
   function handleCardLike(card) {
-    const isFavourites = card.likes.some(item => item._id === currentUser._id);
-
+    const isFavourites = card.likes.some(item => item === currentUser._id);
     api.toggleCardLikes(isFavourites, card._id).then((newCard) => {
       setCards((state) => state.map((item) => item._id === card._id ? newCard : item));
     })
@@ -151,7 +141,7 @@ function App() {
 
   function handleRegistering(login, password) {
 
-    auth.setUser(login, password)
+    api.setUser(login, password)
       .then((res) => {
         setSuccess(true);
       })
@@ -163,10 +153,9 @@ function App() {
   }
 
   function handleLogin(login, password) {
-    auth.authUser(login, password)
+    api.authUser(login, password)
       .then((res) => {
-        if (res.token) {
-          localStorage.setItem('token', res.token);
+        if (res) {
           setLoggedIn(true);
           setEmail(login);
           history.push('/');
@@ -181,9 +170,8 @@ function App() {
   }
 
   function handleExit() {
+    api.logout();
     setLoggedIn(false);
-    localStorage.removeItem('token');
-    // history.push('/sign-in');
   }
 
   React.useEffect(() => {
